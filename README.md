@@ -24,10 +24,10 @@ def near(pos: list , system=[[-1 , -1] , [-1 , 0] , [-1 , 1] , [0 , -1] , [0 , 1
 
 
 while 1:
-    # Заполняем экран белым цветом
+    
     root.fill(WHITE)
 
-    # Рисуем сетку
+    
     for i in range(0 , root.get_height() // 20):
         p.draw.line(root , BLACK , (0 , i * 20) , (root.get_width() , i * 20))
     for j in range(0 , root.get_width() // 20):
