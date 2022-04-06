@@ -1,7 +1,7 @@
 import tkinter as tk
 
 WIDTH, HEIGHT = 600, 400
-cell = {'size': 20, 'color': 'light grey'}
+cell = {'size': 20, 'color': '#F9E559'}
 COLS, ROWS = WIDTH//cell['size'], HEIGHT//cell['size']
 data = [[False for x in range(COLS)] for y in range(ROWS)]
 
@@ -17,7 +17,7 @@ label = tk.Label(win, textvariable=text,  font=('IPAex Gothic', '24'))
 label.pack()
 
 
-cv = tk.Canvas(win, width=WIDTH, height=HEIGHT, bg='brown')
+cv = tk.Canvas(win, width=WIDTH, height=HEIGHT, bg='#473E3F')
 cv.pack()
 
 
@@ -84,10 +84,10 @@ def next_turn(e):
     draw()
 
 
-win.bind('<Return>', next_turn)  #When Enter is pressed
+win.bind('<Return>', next_turn)
 
 
-#Draw a cell.
+
 def draw():
     cv.delete('all')
     for y in range(ROWS):
