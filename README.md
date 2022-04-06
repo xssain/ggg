@@ -1,60 +1,100 @@
-import time
+import tkinter as tk
 
-import pygame as p
-import random
-from pygame.locals import *
+WIDTH, HEIGHT = 600, 400
+cell = {'size': 20, 'color': 'light grey'}
+COLS, ROWS = WIDTH//cell['size'], HEIGHT//cell['size']
+data = [[False for x in range(COLS)] for y in range(ROWS)]
 
-
-BLACK = (0 , 0 , 0)
-WHITE = (255 , 255 , 255)
-
-root = p.display.set_mode((1000 , 500))
-
-cells = [[random.choice([0 , 1]) for j in range(root.get_width() // 20)] for i in range(root.get_height() // 20)]
+win = tk.Tk()
+win.title('LifeGame')
 
 
 
-def near(pos: list , system=[[-1 , -1] , [-1 , 0] , [-1 , 1] , [0 , -1] , [0 , 1] , [1 , -1] , [1 , 0] , [1 , 1]]):
-    count = 0
-    for i in system:
-        if cells[(pos[0] + i[0]) % len(cells)][(pos[1] + i[1]) % len(cells[0])]:
-            count += 1
-    return count
+text = tk.StringVar()
+update = 0
+text.set(update)
+label = tk.Label(win, textvariable=text,  font=('IPAex Gothic', '24'))
+label.pack()
+
+
+cv = tk.Canvas(win, width=WIDTH, height=HEIGHT, bg='brown')
+cv.pack()
 
 
 
-while 1:
-    
-    root.fill(WHITE)
+def draw_grid():
+    for x in range(COLS):
+        x1 = x * cell['size']
+        cv.create_line(x1, 0, x1, HEIGHT, fill='white')
+    for y in range(ROWS):
+        y1 = y * cell['size']
+        cv.create_line(0, y1, WIDTH, y1, fill='white')
 
-    
-    for i in range(0 , root.get_height() // 20):
-        p.draw.line(root , BLACK , (0 , i * 20) , (root.get_width() , i * 20))
-    for j in range(0 , root.get_width() // 20):
-        p.draw.line(root , BLACK , (j * 20 , 0) , (j * 20 , root.get_height()))
-  
-    for i in p.event.get():
-        if i.type == QUIT:
-            quit()
-    
 
-    for i in range(0 , len(cells)):
-        for j in range(0 , len(cells[i])):
-            print(cells[i][j],i,j)
-            p.draw.rect(root , (255 * cells[i][j] % 256 , 0 , 0) , [i * 20 , j * 20 , 20 , 20])
-    
-    p.display.update()
-    cells2 = [[0 for j in range(len(cells[0]))] for i in range(len(cells))]
-    for i in range(len(cells)):
-        for j in range(len(cells[0])):
-            if cells[i][j]:
-                if near([i , j]) not in (2 , 3):
-                    cells2[i][j] = 0
-                    continue
-                cells2[i][j] = 1
-                continue
-            if near([i , j]) == 3:
-                cells2[i][j] = 1
-                continue
-            cells2[i][j] = 0
-    cells = cells2
+
+def place_cells(e):
+    draw_grid()
+
+    x, y = e.x // cell['size'], e.y // cell['size']
+
+    if data[y][x]:
+        cv.delete('current')
+        data[y][x] = False
+
+    else:
+        x1, y1 = x * cell['size'], y * cell['size']
+        cv.create_oval(x1, y1, x1+cell['size'], y1+cell['size'], fill=cell['color'])
+        data[y][x] = True
+
+
+cv.bind('<Button>', place_cells)
+
+
+
+def check_cells(x, y):
+
+    tbl = [(-1, -1), (0, -1), (1, -1), (1, 0), (1, 1), (0, 1), (-1, 1), (-1, 0)]
+    cnt = 0
+
+    for t in tbl:
+        xx, yy = x + t[0], y + t[1]
+        if not 0 <= xx < COLS or not 0 <= yy < ROWS:
+            continue
+        if data[yy][xx]:
+            cnt += 1
+
+    if cnt == 3:
+        return True
+    if data[y][x]:
+        if 2 <= cnt <= 3:
+            return True
+        return False
+    return data[y][x]
+
+
+
+def next_turn(e):
+    global data
+    global update
+
+    data2 = [[check_cells(x, y) for x in range(COLS)] for y in range(ROWS)]
+    data = data2
+    update += 1
+    text.set(update)
+    draw()
+
+
+win.bind('<Return>', next_turn)  #When Enter is pressed
+
+
+#Draw a cell.
+def draw():
+    cv.delete('all')
+    for y in range(ROWS):
+        for x in range(COLS):
+            if data[y][x]:
+                x1, y1 = x * cell['size'], y * cell['size']
+                cv.create_oval(x1, y1, x1+cell['size'], y1+cell['size'], fill=cell['color'])
+
+
+win.mainloop()
